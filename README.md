@@ -1,6 +1,12 @@
 # cabal-install-trace
 *Render a log of cabal install as a graph.*
 
+`cabal install hakyll`, rendered without dependency arrows.
+![cabal install hakyll](images/cabal-install-hakyll.png)
+
+`cabal install aeson`, rendered with dependency arrows, and the `attoparsec` slice selected. Dependencies and dependees are listed.
+![cabal install aeson](images/cabal-install-aeson-flow.png)
+
 ## Prerequisites
 
 ### 1. Build log
@@ -25,7 +31,7 @@ You'll need a build log from `cabal install`, annotated with the timestamps of e
 ...
 ```
 
-`timestamp.sh` is a simple tool to prepend each line with the time since the script started.
+`timestamp.sh` is a simple tool to prepend each line with the time since the script started. It's provided in this repository.
 
 ### 2. Optional: a ghc-pkg dot file
 
@@ -55,7 +61,7 @@ Invoke the tool with the files you've prepared. Accepted parameters:
  $ cabal-install-trace log.txt log-pkgs.txt > log.json
  $ ../catapult/tracing/trace2html log.json
 log.html
- $ open log.html # or open with your default browser
+ $ open log.html # or open with your favourite browser
 ```
 
-To see the package dependencies, enable `Flow events` under the `View Options` menu.
+To see the package dependency arrows, enable `Flow events` under the `View Options` menu.
