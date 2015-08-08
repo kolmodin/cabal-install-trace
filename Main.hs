@@ -2,21 +2,23 @@
 module Main where
 
 import Data.Maybe
-import Data.Char
 import qualified Data.ByteString.Lazy.Char8 as B
 import GHC.Generics
-import Control.Monad
 
 import Data.Aeson
 import qualified Data.Text as T
+import qualified Data.Text.IO as T
+import qualified Data.Text.Read as T
+
 
 data Row = Row {
-  cat :: String,
+  cat :: T.Text,
   pid :: Int,
   tid :: Int,
   ts :: Int,
-  ph :: String,
-  name :: String,
+  ph :: T.Text,
+  name :: T.Text,
+  id :: Maybe T.Text,
   args :: Args
 } deriving Generic
 
@@ -32,7 +34,7 @@ instance ToJSON Args where
 
 main :: IO ()
 main = do
-  raw <- getContents
+  raw <- T.getContents
   B.putStrLn (encode (process raw))
 
 pidFixup :: File -> File
@@ -44,23 +46,21 @@ pidFixup (File rows) = File (go ([0..], []) rows)
         r' = r { name = "parallel", pid = 1, ph = "C", args = Args [("", toJSON (length ps'))]}
         (n,ns',ps')
           | ph r == "B" = (head ns, tail ns, (name r, head ns):ps)
-          | otherwise = fromMaybe (error ("tried to end pkg that has not started: " ++ name r)) $ do
+          | otherwise = fromMaybe (error ("tried to end pkg that has not started: " ++ T.unpack (name r))) $ do
               n' <- lookup (name r) ps
               return (n', n':ns, [ (k,v) | (k,v) <- ps, k /= name r])
 
-process :: String -> File
-process = pidFixup . File . mapMaybe processRow . lines
+process :: T.Text -> File
+process = pidFixup . File . mapMaybe parseRow . T.lines
 
-processRow :: String -> Maybe Row
-processRow row = do
-  [time_s, action, pkg] <- return (words row)
-  guard ((not . null) time_s && last time_s == ':')
-  let time_as_string = init time_s
-  guard (all isNumber time_as_string)
-  let t = read time_as_string
+parseRow :: T.Text -> Maybe Row
+parseRow row = do
+  [time_s, action, pkg] <- return (T.words row)
+  Right (time, ":") <- return (T.decimal time_s)
   phase <- case action of
     "Configuring" -> return "B"
     "Installed" -> return "E"
     _ -> fail ""
-  let pkg_name = reverse . dropWhile (=='.') . reverse $ pkg
-  return (Row "cabal-install" 0 0 t phase pkg_name (Args []))
+  let pkg_name = T.dropWhileEnd (=='.') pkg
+  return (Row "cabal-install" 0 0 time phase pkg_name Nothing (Args []))
+  
