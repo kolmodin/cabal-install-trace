@@ -15,6 +15,6 @@ cabal-version:       >=1.10
 
 executable cabal-install-trace
   main-is:             Main.hs
-  build-depends:       base >=4.7 && <4.9, bytestring, aeson, text
+  build-depends:       base >=4.7 && <4.9, bytestring, aeson, text, unordered-containers
   default-language:    Haskell2010
   default-extensions: DeriveGeneric, OverloadedStrings
