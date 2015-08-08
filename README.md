@@ -13,7 +13,7 @@
 You'll need a build log from `cabal install`, annotated with the timestamps of each line.
 
 ```bash
- $ cabal install hakyll -j | ./timestamp.sh | tee build-log.txt
+ $ cabal install hakyll -j | ./timestamp.sh | tee cabal-install-log.txt
 2124420: Resolving dependencies...
 3920216: Notice: installing into a sandbox located at
 3924960: /Users/kolmodin/code/project/.cabal-sandbox
@@ -38,7 +38,8 @@ You'll need a build log from `cabal install`, annotated with the timestamps of e
 The tool can also illustrate dependencies if you provide the output of `ghc-pkg dot`. In my case, I installed into a sandbox, so I provide the sandbox' pkg db path.
 
 ```bash
- $ ghc-pkg dot --package-db=.cabal-sandbox/x86_64-osx-ghc-7.10.2-packages.conf.d/ | tee log-pkgs.txt
+ $ ghc-pkg dot --package-db=.cabal-sandbox/x86_64-osx-ghc-7.10.2-packages.conf.d/ \
+     | tee ghc-pkg-dot-log.txt
 digraph {
 ...
 ```
@@ -58,7 +59,7 @@ Invoke the tool with the files you've prepared. Accepted parameters:
 `cabal-install-trace [<cabal install build log> [<ghc-pkg dot file>] ]`
 
 ```bash
- $ cabal-install-trace log.txt log-pkgs.txt > log.json
+ $ cabal-install-trace cabal-install-log.txt ghc-pkg-dot-log.txt > log.json
  $ ../catapult/tracing/trace2html log.json
 log.html
  $ open log.html # or open with your favourite browser
