@@ -17,7 +17,7 @@ import qualified Data.Text.Read as T
    https://docs.google.com/document/d/1CvAClvFfyA5R-PhYUmn5OOQtYMH4h6I0nSsKchNAySU
  -}
 
-data Row = Row {
+data Event = Event {
   cat :: T.Text,
   pid :: Int,
   tid :: Int,
@@ -28,14 +28,14 @@ data Row = Row {
   args :: Args
 } deriving Generic
 
-data File = File [Row] deriving Generic
+data File = File [Event] deriving Generic
 
-unFile :: File -> [Row]
+unFile :: File -> [Event]
 unFile (File rows) = rows
 
 data Args = Args [(T.Text, Value)]
 
-instance ToJSON Row
+instance ToJSON Event
 instance ToJSON File
 
 instance ToJSON Args where
@@ -95,10 +95,10 @@ process :: Deps -> File -> File
 process deps = flowFixup deps . pidFixup
 
 parseFile :: T.Text -> File
-parseFile = File . mapMaybe parseRow . T.lines
+parseFile = File . mapMaybe parseEvent . T.lines
 
-parseRow :: T.Text -> Maybe Row
-parseRow row = do
+parseEvent :: T.Text -> Maybe Event
+parseEvent row = do
   [time_s, action, pkg] <- return (T.words row)
   Right (time, ":") <- return (T.decimal time_s)
   phase <- case action of
@@ -106,7 +106,7 @@ parseRow row = do
     "Installed" -> return "E"
     _ -> fail ""
   let pkg_name = T.dropWhileEnd (=='.') pkg
-  return (Row "cabal-install" 0 0 time phase pkg_name Nothing (Args []))
+  return (Event "cabal-install" 0 0 time phase pkg_name Nothing (Args []))
 
 parseDeps :: T.Text -> Deps
 parseDeps = mapMaybe parseDep . T.lines
