@@ -1,5 +1,5 @@
 # cabal-install-trace
-*Render a log of a cabal install as a graph.*
+*Render a log of cabal install as a graph.*
 
 ## Prerequisites
 
@@ -7,7 +7,7 @@
 You'll need a build log from `cabal install`, annotated with the timestamps of each line.
 
 ```bash
- $ cabal install pandoc hakyll -j | ./timestamp.sh | tee build-log.txt
+ $ cabal install hakyll -j | ./timestamp.sh | tee build-log.txt
 2124420: Resolving dependencies...
 3920216: Notice: installing into a sandbox located at
 3924960: /Users/kolmodin/code/project/.cabal-sandbox
@@ -57,3 +57,5 @@ Invoke the tool with the files you've prepared. Accepted parameters:
 log.html
  $ open log.html # or open with your default browser
 ```
+
+To see the package dependencies, enable `Flow events` under the `View Options` menu.

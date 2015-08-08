@@ -14,7 +14,7 @@ import qualified Data.Text.IO as T
 import qualified Data.Text.Read as T
 
 {- The trace event file format is documented at
-   https://docs.google.com/document/d/1CvAClvFfyA5R-PhYUmn5OOQtYMH4h6I0nSsKchNAySU
+   https://docs.google.com/document/d/1CvAClvFfyA5R-PhYUmn5OOQtYMH4h6I0nSsKchNAySU/preview
  -}
 
 data Event = Event {
